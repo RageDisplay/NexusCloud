@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusCloud</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .file-list {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .file-list.show {
+            display: block;
+        }
+
+        .file-item {
+            background: #f5f5f5;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-name {
+            flex: 1;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-small:hover {
+            background: #764ba2;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.show {
+            display: block;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NexusCloud</h1>
+
+        <div id="authSection">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Вход</button>
+                <button class="tab-btn" onclick="switchTab('register')">Регистрация</button>
+            </div>
+
+            <div id="login" class="tab-content active">
+                <div class="alert" id="loginAlert"></div>
+                <div class="form-group">
+                    <label>Имя пользователя</label>
+                    <input type="text" id="loginUsername" placeholder="Введите имя пользователя">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="Введите пароль">
+                </div>
+                <button onclick="login()">Войти</button>
+            </div>
+
+            <div id="register" class="tab-content">
+                <div class="alert" id="registerAlert"></div>
+                <div class="form-group">
+                    <label>Имя пользователя</label>
+                    <input type="text" id="registerUsername" placeholder="Минимум 3 символа">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" placeholder="Email адрес">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="registerPassword" placeholder="Минимум 12 символов">
+                </div>
+                <button onclick="register()">Зарегистрироваться</button>
+            </div>
+        </div>
+
+        <div id="dashboardSection" class="dashboard">
+            <div class="alert" id="dashboardAlert"></div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Статус</div>
+                    <div class="stat-value">✓ Активен</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Роль</div>
+                    <div class="stat-value" id="userRole">Пользователь</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Загрузить файл</label>
+                <input type="file" id="fileInput">
+            </div>
+            <button onclick="uploadFile()">Загрузить</button>
+
+            <div class="file-list" id="fileList">
+                <h3 style="margin-bottom: 10px;">Мои файлы</h3>
+                <div id="filesContainer"></div>
+            </div>
+
+            <button class="logout-btn" onclick="logout()">Выход</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin + '/api';
+        const API_FILES = window.location.origin + '/api/v1';
+        let token = localStorage.getItem('token');
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.textContent = message;
+            alert.className = `alert show ${type}`;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        async function register() {
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            if (!username || !email || !password) {
+                showAlert('registerAlert', 'Заполните все поля', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showAlert('registerAlert', 'Регистрация успещна! Теперь войдите', 'success');
+                    document.getElementById('registerUsername').value = '';
+                    document.getElementById('registerEmail').value = '';
+                    document.getElementById('registerPassword').value = '';
+                } else {
+                    showAlert('registerAlert', data.error || 'Ошибка регистрации', 'error');
+                }
+            } catch (err) {
+                showAlert('registerAlert', 'Ошибка подключения', 'error');
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                showAlert('loginAlert', 'Заполните все поля', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    token = data.data.token;
+                    console.log('Login successful, token:', token);
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('username', data.data.username);
+                    localStorage.setItem('isAdmin', data.data.is_admin);
+                    showDashboard();
+                    loadFiles();
+                } else {
+                    showAlert('loginAlert', data.error || 'Ошибка входа', 'error');
+                }
+            } catch (err) {
+                showAlert('loginAlert', 'Ошибка подключения', 'error');
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('dashboardSection').classList.add('show');
+            const isAdmin = localStorage.getItem('isAdmin') === 'true';
+            document.getElementById('userRole').textContent = isAdmin ? 'Администратор' : 'Пользователь';
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files.length) {
+                showAlert('dashboardAlert', 'Выберите файл', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch(`${API_FILES}/files/upload`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showAlert('dashboardAlert', 'Файл загружен успешно', 'success');
+                    fileInput.value = '';
+                    loadFiles();
+                } else {
+                    showAlert('dashboardAlert', data.error || 'Ошибка загрузки', 'error');
+                }
+            } catch (err) {
+                showAlert('dashboardAlert', 'Ошибка подключения', 'error');
+            }
+        }
+
+        async function loadFiles() {
+            try {
+                const res = await fetch(`${API_FILES}/files/list?path=.`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    const container = document.getElementById('filesContainer');
+                    container.innerHTML = '';
+                    const files = data.data || [];
+
+                    if (files.length === 0) {
+                        container.innerHTML = '<p style="color: #999;">Нет файлов</p>';
+                    } else {
+                        files.forEach(file => {
+                            const item = document.createElement('div');
+                            item.className = 'file-item';
+                            item.innerHTML = `
+                                <div class="file-name">${file.Name}</div>
+                                <div class="file-actions">
+                                    <button class="btn-small" onclick="downloadFile('${file.Name}')">Скачать</button>
+                                    <button class="btn-small btn-danger" onclick="deleteFile('${file.Name}')">Удалить</button>
+                                </div>
+                            `;
+                            container.appendChild(item);
+                        });
+                    }
+
+                    document.getElementById('fileList').classList.add('show');
+                }
+            } catch (err) {
+                console.error('Error loading files', err);
+            }
+        }
+
+        async function downloadFile(fileName) {
+            try {
+                const res = await fetch(`${API_FILES}/files/download?file=${encodeURIComponent(fileName)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) {
+                    showAlert('dashboardAlert', 'Ошибка скачивания файла', 'error');
+                    return;
+                }
+
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (err) {
+                showAlert('dashboardAlert', 'Ошибка подключения при скачивании', 'error');
+            }
+        }
+
+        async function deleteFile(fileName) {
+            if (!confirm('Вы уверены?')) return;
+
+            try {
+                const res = await fetch(`${API_FILES}/files/delete?file=${encodeURIComponent(fileName)}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showAlert('dashboardAlert', 'Файл удален', 'success');
+                    loadFiles();
+                } else {
+                    showAlert('dashboardAlert', data.error || 'Ошибка удаления', 'error');
+                }
+            } catch (err) {
+                showAlert('dashboardAlert', 'Ошибка подключения', 'error');
+            }
+        }
+
+        function logout() {
+            token = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            localStorage.removeItem('isAdmin');
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('dashboardSection').classList.remove('show');
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        // Check if already logged in
+        if (token) {
+            showDashboard();
+            loadFiles();
+        }
+    </script>
+</body>
+</html>

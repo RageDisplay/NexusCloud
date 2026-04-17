@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  nexus-cloud:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexus-cloud
+    restart: unless-stopped
+    
+    ports:
+      - "8080:8080"        # HTTP
+      - "8443:8443"        # HTTPS
+      # - "445:445"          # SMB/CIFS disabled
+      # - "2049:2049"        # NFS port 2049 disabled
+    
+    volumes:
+      - ./data/storage:/data/storage          # User storage (local directory)
+      - ./data/db:/data/db                    # Database (local directory)
+      - ./certs:/etc/nexus-cloud/certs:ro     # SSL certificates (read-only)
+    
+    environment:
+      # Server Configuration
+      HTTP_PORT: 8080
+      HTTPS_PORT: 8443
+      ENABLE_HTTPS: "true"
+      CERT_FILE: /etc/nexus-cloud/certs/server.crt
+      KEY_FILE: /etc/nexus-cloud/certs/server.key
+      
+      # Storage Configuration
+      STORAGE_PATH: /data/storage
+      MAX_FILE_SIZE: 107374182400  # 100GB
+      
+      # Database Configuration
+      DB_PATH: /data/db/nexus.db
+      
+      # Security Configuration
+      SESSION_EXPIRY: 24h
+      MAX_LOGIN_ATTEMPTS: 5
+      LOCKOUT_DURATION: 15m
+      
+      # Features
+      SMB_ENABLED: "false"          # Disabled 
+      # SMB_PORT: 445
+      SMB_SHARE_NAME: NexusCloud
+      
+      NFS_ENABLED: "false"          # Disabled
+      # NFS_PORT: 2049
+      NFS_ROOT: /exports
+      
+      # Admin User
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme@12345}
+    
+    networks:
+      - nexus-network
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  nexus-network:
+    driver: bridge
