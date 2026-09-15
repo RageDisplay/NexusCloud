@@ -4,7 +4,7 @@
 - **AES-256-GCM**: Шифрование данных в покое (at rest)
 - **TLS 1.3**: Шифрование при передаче (in transit)
 - **SHA-256**: Хеширование файлов для проверки целостности
-https://drive.google.com/file/d/1gtN5HrXTF1IYqz5vL087hyrTRbQt0Ifg/view?usp=sharing
+
 ### Аутентификация
 - **bcrypt**: Хеширование паролей с cost=14
 - **JWT токены**: Безопасные сеансы с автоистечением
