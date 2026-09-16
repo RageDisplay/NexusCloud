@@ -23,4 +23,4 @@
 - Go 1.24+ 
 - OpenSSL 
 - SSD диск для хранения
-https://drive.google.com/file/d/18h-noi-qWML7oc4a3rKqty5--xRUudMO/view?usp=sharing
+
